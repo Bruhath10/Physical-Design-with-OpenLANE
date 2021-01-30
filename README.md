@@ -1,5 +1,5 @@
 # Advanced Physical Design with OpenLANE
-Physical Design using OpenLANE / Sky130 by the VSD corp. done on a cloud-based platform known as VSD-IAT, a user-friendly platform to learn and implement the essential skills in physical design using open-source EDA tools.
+Physical Design using OpenLANE / Sky130 by the VSD corp. LTD, done on a cloud-based platform known as VSD-IAT, a user-friendly platform to learn and implement the essential skills in physical design using open-source EDA tools.
 
 ## Contents
 - 1. Introduction
