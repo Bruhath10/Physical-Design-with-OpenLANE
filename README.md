@@ -1,5 +1,5 @@
-# Physical-Design-with-OpenLANE
-Physical Design using OpenLANE / Sky130 
+# Advanced-Physical-Design-with-OpenLANE
+Physical Design using OpenLANE / Sky130 by The VSD corp. done on a cloud-based platform known as VSD-IAT, a user-friendly platform to learn and implement the essential skills in physical design using open-source EDA tools.
 
 ## Contents
 - 1. Introduction
@@ -7,6 +7,9 @@ Physical Design using OpenLANE / Sky130
 - 3. The OpenLANE Flow
 - 4. Day 1: Overview of the tools, Preparation and Synthesis steps
 - 5. Day 2: Floor Planning and Placement
+- 6. Day 3: Designing a Library cell
+- 7. Day 4: Placing the custom Inverter and CTS
+- 8. Day 5: PDN and Routing
 
 ## 1. Introduction
 OpenLANE is an automated RTL to GDSII flow which uses several Open-Source tools like OpenROAD, Yosys, Magic, Netgen, Fault, OpenPhySyn and a SPEF extractor to run the flow. We can use customized scripts for modelling and optimization of the steps. It is a methodology or process designed to work specifically on Google-Skywater 130nm PDKs (Open-Source PDKs) using Open-Source tools. The target of OpenLANE is to produce clean GDSII without any human intervention and is used to produce hard macros and chips.
@@ -341,7 +344,177 @@ Plotting the inverter output vs time and input
 ![13 - 50% value of input and output (propagation delay)](https://user-images.githubusercontent.com/44549567/106356485-eb722c00-6325-11eb-88a9-018e0e64a59f.JPG)
 
 
-## Day 4: 
+## 7. Day 4: Placing the custom Inverter and CTS
+
+#### Adding Tracks to Layout
+Before we try to insert our custom design inverter onto the chip, we need to make some changes to the layout in magic such as adding a grid with width and pitch dimensions as described in the 'Tracks.info' file in the PDK, so that it can be placed properly on the PDN grid.
+
+Tracks.info file in the pdks folder
+
+![1 - Tracks info in pdks folder](https://user-images.githubusercontent.com/44549567/106358752-1b283080-6334-11eb-878d-de24ca24ecf2.JPG)
+
+Tracks.info file
+
+![2 - Tracks info](https://user-images.githubusercontent.com/44549567/106358757-23806b80-6334-11eb-8ed4-eae612f1d3fc.JPG)
+
+Adding a grid with the described width and pitch and saving the 'mag' file foe further steps
+
+![8 - saving mag file](https://user-images.githubusercontent.com/44549567/106359066-18c6d600-6336-11eb-9b69-fbc4b9f37da4.JPG)
+
+Layout with the grid
+
+![5 - tracks in layout](https://user-images.githubusercontent.com/44549567/106359230-5415d480-6337-11eb-8ae9-bef9c8c539ce.JPG)
+
+We can see that the inverter satisfies the rules saying 'the input port A and output port Y should lie on the intersection of the horizontal and vertical tracks', and 'the width of inverter should be an odd multiple of width of the grid'.
+
+![6 - we can notice the 'A' and 'Y' are on the intersection of the horizontal and vertical tracks as per rules](https://user-images.githubusercontent.com/44549567/106359427-c20ecb80-6338-11eb-9a08-7d86e74ade21.JPG)
+
+![7 -  Odd multiple of boxes in width and even multiple of boxes in length (Inside the inner white rectangle)](https://user-images.githubusercontent.com/44549567/106359434-caff9d00-6338-11eb-9af7-b785ddecb555.JPG)
+
+#### Generating the LEF file
+Placement and Routing is performed taking the LEF (Library Exchange Format) file as the input. The technology LEF file contains data about layer information, via information, and restricted DRC rules. The Cell LEF file consists of abstract information of standard cells. LEF is a specification for representing the physical layout of an integrated circuit in an ASCII format. LEF is used in conjunction with Design Exchange Format (DEF) to represent the complete physical layout of an integrated circuit while it is being designed.
+
+![9 - generating lef file](https://user-images.githubusercontent.com/44549567/106359449-dd79d680-6338-11eb-9d85-199b3011939a.JPG)
+
+Inverter LEF file
+
+![10 - inverte LEF file_1](https://user-images.githubusercontent.com/44549567/106359496-32b5e800-6339-11eb-97e1-5859234d863c.JPG)
+
+Including the required libraries into the configuration file in our design (picorv32) folder
+
+![12 - Changes made to config tcl in picorv32a folder](https://user-images.githubusercontent.com/44549567/106359582-ac4dd600-6339-11eb-8e87-60daa65e0af8.JPG)
+
+#### Running the RTL-to-GDSII flow
+We run the preparation again with the updated configuration file and overwrite the 'runs' folder. We then include our inverter LEF file and merge it with the rest of the LEFs, and run synthesis.
+
+![15 - including our lef file after prep step_2](https://user-images.githubusercontent.com/44549567/106359943-d43e3900-633b-11eb-9b85-910d929705f9.JPG)
+
+We can see our inverter instances in the synthesis report
+
+![16 - 2201 instances of our inverter](https://user-images.githubusercontent.com/44549567/106359974-02bc1400-633c-11eb-80ba-bdfc0c866bdf.JPG)
+
+
+#### Post-Synthesis timing analysis
+STA will report problems such as worst negative slack (WNS) and total negative slack (TNS) which are the worst path delay and total path delay based on the setup timing restraint. Slack violations can be fixed through OpenSTA, which is integrated in the OpenLANE tool. We need to make necessary changes to the following files
+- Configuration files (.conf)
+- Synopsys design constraint (.sdc) files
+
+Sta.conf file
+
+![17](https://user-images.githubusercontent.com/44549567/106363723-533d6c80-6350-11eb-9401-9680039a8408.jpg)
+
+To analyze and make necessary changes, we need to take the following steps
+- Review the synthesis strategy in OpenLANE
+- Enable cell buffering
+- Perform manual cell replacement on our WNS path with the OpenSTA tool
+- Optimize the fanout value with OpenLANE tool
+
+The slack after synthesis run
+
+![17 - Slack violation after new synthesis run (with our inverter included)](https://user-images.githubusercontent.com/44549567/106360245-6b57c080-633d-11eb-9107-b4cc4b38784a.JPG)
+
+Changing the Synthesis strategy form 'Optimal Area' to 'Optimal Delay', enabling 'Cell Buffering'
+
+![19 - changing other strategies](https://user-images.githubusercontent.com/44549567/106361510-52064280-6344-11eb-90d3-1cc71a719234.JPG)
+
+Slack results before and after the strategy change
+
+![20 - modified slack results](https://user-images.githubusercontent.com/44549567/106361526-73ffc500-6344-11eb-8fe3-cefa32c6dadc.JPG)
+
+#### Placement
+
+Running the placement with inverter LEF included in the merged LEF file (done in preparation step)
+
+![22 - layout after placement (with our inverter)](https://user-images.githubusercontent.com/44549567/106361560-9bef2880-6344-11eb-811e-5805fab467bd.JPG)
+
+An instance of our inverter in the layout
+
+![23 - our inverter in the layout](https://user-images.githubusercontent.com/44549567/106361613-e2448780-6344-11eb-9727-abf2442ad416.JPG)
+
+Alignment of the inverter cell with the PDN
+
+![25 - our inverter correctly alligned to the adj  cell](https://user-images.githubusercontent.com/44549567/106361789-7b739e00-6345-11eb-88c9-f74d57772b15.JPG)
+
+
+#### Post-placement timing analysis
+
+To achieve a better Slack, Fan-out for the cells resulting in high delays can be increased, and small buffers driving heavy load can be replaced with bigger buffers at a cost of Area on the chip.
+
+Small buffer driving heavy load
+
+![9](https://user-images.githubusercontent.com/44549567/106363201-29367b00-634d-11eb-8a87-17bb004e189f.jpg)
+
+Replacing small buffer with larger buffer
+
+![10](https://user-images.githubusercontent.com/44549567/106363253-70bd0700-634d-11eb-9b8e-e603c792689d.jpg)
+
+Improved slack after buffer eplacement
+
+![11](https://user-images.githubusercontent.com/44549567/106363341-fb9e0180-634d-11eb-8f76-3f0ad8663cdc.jpg)
+
+Increase in core area due to buffer replacement
+
+![12](https://user-images.githubusercontent.com/44549567/106363376-3d2eac80-634e-11eb-9904-7d4f7adcf33c.jpg)
+
+#### Running CTS
+
+Successful CTS run
+
+![13](https://user-images.githubusercontent.com/44549567/106363441-91d22780-634e-11eb-8e62-c740beee8300.jpg)
+
+New netlist file created after CTS (Post-CTS netlist = Pre-CTS netlist + Buffers)
+
+![15](https://user-images.githubusercontent.com/44549567/106363513-073df800-634f-11eb-8bc4-1335a2a68604.jpg)
+
+
+## 8. Day 5: PDN and Routing
+
+#### Power Delivery Network (PDN)
+
+To generate PDN in OpenLANE
+
+![16](https://user-images.githubusercontent.com/44549567/106363624-9fd47800-634f-11eb-9c39-967fed0b9374.jpg)
+
+PDN successful showing the width and pitch of the network
+
+![18](https://user-images.githubusercontent.com/44549567/106363766-8ed83680-6350-11eb-88c9-aba2ef8763c7.jpg)
+
+New DEF file created after PDN
+
+![4 - modified DEF file after pdn creation](https://user-images.githubusercontent.com/44549567/106363804-c515b600-6350-11eb-98d9-15fa00589f31.JPG)
+
+#### Routing
+
+Routing done successfully
+
+![5 - Routing completed](https://user-images.githubusercontent.com/44549567/106363854-19b93100-6351-11eb-824a-e1e0155035ab.JPG)
+
+Lower memory usage, and lower run-time strategy was chosen and hence non-zero violations
+
+![19](https://user-images.githubusercontent.com/44549567/106364001-f3e05c00-6351-11eb-8881-75af0acd0f4b.jpg)
+
+Netlist created post-routing
+
+![11 - netlists created during routing](https://user-images.githubusercontent.com/44549567/106364069-694c2c80-6352-11eb-8dbd-f6a63bb5af88.JPG)
+
+#### SPEF Extraction
+After routing is done, the interconnect parasitics are extracted from post-route STA analysis to perform sign-off. The parasitics are extracted into a SPEF file. An external SPEF extractor is used as it is not included within OpenLANE as of now.
+
+Running SPEF extractor
+
+![20](https://user-images.githubusercontent.com/44549567/106364121-c3e58880-6352-11eb-9bbf-a64b35693ded.jpg)
+
+SPEF file
+
+![10 -SPEF file](https://user-images.githubusercontent.com/44549567/106364191-39e9ef80-6353-11eb-9428-719a5e3745a5.JPG)
+
+## Acknowledgements
+
+- Nickson Jose, VSD VLSI Engineer
+- Kunal Ghosh, Cofounder (VSD  Corp. Pvt. LTD)
+
+
+
 
 
 
