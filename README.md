@@ -251,7 +251,6 @@ Layout after placement
 ![24 - post-placement layout in magic (placement of std  cells)](https://user-images.githubusercontent.com/44549567/106324113-9ccd7f00-629e-11eb-8708-e8b29691a75a.JPG)
 
 #### Library Characterization 
-
 The Inputs required by the characterization software are **Process Design Kits (PDKs)** which contain DRC, LVS Rules, Spice Models, Library and User-Defined Specifications such as the Width between the power lines (the cell height), drive strength etc. The Design step involves 'Layout design' and 'Characterization Flow'. The GUNA software takes the inputs and gives GDS2, LEF and extracted Spice netlist as Outputs. The Characterization is classified into Timing, Noise and Power Characterization.
 
 #### Characterization Flow Steps 
@@ -265,7 +264,90 @@ The Inputs required by the characterization software are **Process Design Kits (
 - Provide necessary simulation commands
 
 
-## 6. Day 3: 
+## 6. Day 3: Designing a Library cell
+
+The advantage of OpenLANE is that we can make changes to the internal switches while running the flow. By this, we can experiment and explore the RTL to GDSII flow steps.
+
+#### SPICE Simulations
+
+SPICE deck contains the details of:
+- Model
+- Connectivity of the components
+- Output load capacitance and Resistances
+- Component values
+- Names of the nodes
+- Simulation commands
+
+We model a CMOS inverter in Ngspice by modifying it's spice deck, analyze it's characteristics, generate required files so that we can include it in the netlist to be placed on the chip by running the flow.
+
+#### 16 Mask CMOS process 
+- **Selecting a Substrate :** A Substrate is selected to act as base layer over which other layers are formed.
+- **Creating Active regions for transistors :** Silicon Dioxide (SiO2) and Silicon Nitride (si3N4) are deposited, pockets are created for P and N regions using Lithography.
+- **N-Well and P-Well formation :** Ion implantation is done using Boron for P-well and Phosphorus for N-Well. Drive in diffusion is done by placing in high temperature furnace.
+- **Formation of Gate :** Depending on the requirements of NA (Doping Concentration) and Cox (OXide Capacitance), lithography and ion implantation are done.
+- **Lightly Doped Drain (LDD) Formation :** LDD regions are formed to avoid Hot electron effect and Short channel effect. Plasma anisotropic etching is used to leave small amount of oxide on side walls of Gate
+- **Source-Drain Formation :** Very thin layer of oxide is formed over the top to prevent chanelling effect and, Source and Drain are formed using lithography and ion implantation.
+- **Forming Contacts and interconnects :** Titanium is sputtered on the wafer surface and heated to form TiSi2 and TiN (2 types of metal contacts). Etching done by RCA Cleaning.
+- **Higher Level Metal formation :** Planarizing the top surface, depositing upper metal layers.
+
+#### Magic layout of Inverter standard cell
+
+Opening the layout (mag file) in Magic 
+
+![2 - Opening the inverter layout in Magic (mag file)](https://user-images.githubusercontent.com/44549567/106355801-4dc82e00-6320-11eb-8b7e-dd8c84e188ff.JPG)
+
+![3 - Inverter layout in Magic](https://user-images.githubusercontent.com/44549567/106355829-7b14dc00-6320-11eb-9f1d-0f2f19d382d1.JPG)
+
+SPICE extraction
+
+![5 - step1 of extracting spice netlist](https://user-images.githubusercontent.com/44549567/106356028-4a35a680-6322-11eb-8664-9ac40641881d.JPG)
+
+Extracting parasitics information
+
+![6 - step2 of spice and parasitics extraction](https://user-images.githubusercontent.com/44549567/106356040-751ffa80-6322-11eb-9d3a-17cf4ad23f82.JPG)
+
+Extracted SPICE file
+
+![7 - extracted spice file](https://user-images.githubusercontent.com/44549567/106356046-8406ad00-6322-11eb-83a4-867dda42dbb0.JPG)
+
+Modifications to Spice file for Transient analysis
+
+![8 - modifications to spice for transient analysis](https://user-images.githubusercontent.com/44549567/106356105-042d1280-6323-11eb-981e-0ef31d2ffe33.JPG)
+
+Running the spice file in Ngspice
+
+![9 - opening spice file in Ngspice (last command)](https://user-images.githubusercontent.com/44549567/106356117-1eff8700-6323-11eb-9e62-e04ae49a6bb3.JPG)
+
+Commands to plot the output vs time
+
+![10 - plot y vs time a](https://user-images.githubusercontent.com/44549567/106356513-1492bc80-6326-11eb-91b3-0908209605ca.JPG)
+
+Plotting the inverter output vs time and input
+
+![11 - Inverter output vs time](https://user-images.githubusercontent.com/44549567/106356206-db594d00-6323-11eb-8288-49746cc02fcf.JPG)
+
+#### Timing Characterization
+
+- **Rise Delay :** Time taken for waveform to rise from Slew Low Rise Threshold (20%) to Slew High Rise Threshold (80%) of VDD.
+- **Fall Delay :** Time taken for waveform to fall from Slew High Fall Threshold (80%) to Slew Low Fall Threshold (20%) of VDD.
+- **Propagation Delay :** Measured between 50% of Input transition to 50% of Output transition.
+
+#### Rise Delay (20% and 80% values)
+
+![12 - 20% and 80% value co-ordinates of output  waveform](https://user-images.githubusercontent.com/44549567/106356470-d1384e00-6325-11eb-8be5-53e85d5bffc3.JPG)
+
+#### Propagation Delay (50% values)
+
+![13 - 50% value of input and output (propagation delay)](https://user-images.githubusercontent.com/44549567/106356485-eb722c00-6325-11eb-88a9-018e0e64a59f.JPG)
+
+
+## Day 4: 
+
+
+
+
+
+
 
 
 
