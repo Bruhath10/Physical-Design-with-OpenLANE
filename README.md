@@ -438,7 +438,7 @@ Alignment of the inverter cell with the PDN
 
 #### Post-placement timing analysis
 
-To achieve a better Slack, Fan-out for the cells resulting in high delays can be increased, and small buffers driving heavy load can be replaced with bigger buffers at a cost of Area on the chip.
+To achieve a better Slack, Fan-out for the cells resulting in high delays can be decreased, and small buffers driving heavy load can be replaced with bigger buffers at a cost of Area on the chip.
 
 Small buffer driving heavy load
 
