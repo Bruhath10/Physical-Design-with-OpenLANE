@@ -5,11 +5,11 @@ Physical Design using OpenLANE / Sky130 by the VSD corp. LTD, done on a cloud-ba
 - 1. Introduction
 - 2. RTL to GDSII Overview
 - 3. The OpenLANE Flow
-- 4. Day 1: Overview of the tools, Preparation and Synthesis steps
-- 5. Day 2: Floor Planning and Placement
-- 6. Day 3: Designing a Library cell
-- 7. Day 4: Placing the custom Inverter and CTS
-- 8. Day 5: PDN and Routing
+- 4. Overview of the tools, Preparation and Synthesis steps
+- 5. Floor Planning and Placement
+- 6. Designing a Library cell
+- 7. Placing the custom Inverter and CTS
+- 8. PDN and Routing
 
 ## 1. Introduction
 OpenLANE is an automated RTL to GDSII flow which uses several Open-Source tools like OpenROAD, Yosys, Magic, Netgen, Fault, OpenPhySyn and a SPEF extractor to run the flow. We can use customized scripts for modelling and optimization of the steps. It is a methodology or process designed to work specifically on Google-Skywater 130nm PDKs (Open-Source PDKs) using Open-Source tools. The target of OpenLANE is to produce clean GDSII without any human intervention and is used to produce hard macros and chips.
@@ -85,7 +85,7 @@ The tools used in this flow are as follows:
       - **Netgen** - Performs the LVS rules chekcs on the layout.
       
 
-## 4. Day 1: Overview of the tools, Preparation and Synthesis steps
+## 4. Overview of the tools, Preparation and Synthesis steps
 
 #### Skywater130 PDK files
 
@@ -169,7 +169,7 @@ Synthesis results added to 'runs' folder created during 'preparation' step
 ![26 - post synthesis results in runs folder](https://user-images.githubusercontent.com/44549567/106313546-67b93080-628e-11eb-87b8-c9e8253986ec.JPG)
 
 
-## 5. Day 2: Floor Planning and Placement
+## 5. Floor Planning and Placement
 
 Important aspects of floor planning are:
 - Core Area 
@@ -267,7 +267,7 @@ The Inputs required by the characterization software are **Process Design Kits (
 - Provide necessary simulation commands
 
 
-## 6. Day 3: Designing a Library cell
+## 6. Designing a Library cell
 
 The advantage of OpenLANE is that we can make changes to the internal switches while running the flow. By this, we can experiment and explore the RTL to GDSII flow steps.
 
@@ -344,7 +344,7 @@ Plotting the inverter output vs time and input
 ![13 - 50% value of input and output (propagation delay)](https://user-images.githubusercontent.com/44549567/106356485-eb722c00-6325-11eb-88a9-018e0e64a59f.JPG)
 
 
-## 7. Day 4: Placing the custom Inverter and CTS
+## 7. Placing the custom Inverter and CTS
 
 #### Adding Tracks to Layout
 Before we try to insert our custom design inverter onto the chip, we need to make some changes to the layout in magic such as adding a grid with width and pitch dimensions as described in the 'Tracks.info' file in the PDK, so that it can be placed properly on the PDN grid.
@@ -467,7 +467,7 @@ New netlist file created after CTS (Post-CTS netlist = Pre-CTS netlist + Buffers
 ![15](https://user-images.githubusercontent.com/44549567/106363513-073df800-634f-11eb-8bc4-1335a2a68604.jpg)
 
 
-## 8. Day 5: PDN and Routing
+## 8. PDN and Routing
 
 #### Power Delivery Network (PDN)
 
